@@ -1,0 +1,24 @@
+#!/bin/bash
+if [ "${SHELL##*/}" != "bash" ]; then
+	return
+fi
+echo "audit included=$AUDIT_INCLUDED"
+if [ "$AUDIT_INCLUDED" == "$$" ] || { [ -z "$SSH_ORIGINAL_COMMAND" ] && [ "$(cat /proc/$$/cmdline)" == 'bash-c"/etc/forcecommand.sh"' ]; }; then 
+	return
+else
+	declare -rx AUDIT_INCLUDED="$$"
+fi
+
+declare -rx HISTCONTROL=""
+declare -rx HISTIGNORE=""
+declare -rx HISTCMD=""
+declare -rx AUDIT_LOGINUSER="$(who -mu | awk '{print $1}')"
+declare -rx AUDIN_LOGINPID="$(who -mu | awk '{print $6}')"
+declare -rx AUDIT_USER=$USER
+declare -rx AUDIT_PID=$$
+declare -rx AUDIT_TTY=$(who -mu | awk '{print $2}')
+declare -rx AUDIT_SSH=$([ -n "$SSH_CONNECTION" ] && echo "$SSH_CONNECTION" | awk '{print $1":"$2"->"$3":"$4}')
+declare -rx REMOTEIP=$(who am i | awk '{print $5}' | sed "s/[()]//g" )
+
+
+
